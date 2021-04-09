@@ -25,8 +25,8 @@ router.get('/leaderboard', function(req, res, next) {
         $trs.toArray().forEach(tr => {
           const tds = $(tr).find('td').toArray();
           const playerPos = $(tds[0]).text();
-          const playerName = $(tds[1]).text();
-          const playerScore = $(tds[2]).text();
+          const playerName = $(tds[2]).text();
+          const playerScore = $(tds[3]).text();
           leaderboard[playerName.replace(" (a)", "")] = {
             "pos": playerPos,
             "toPar": playerScore === "E" ? "0" : playerScore
