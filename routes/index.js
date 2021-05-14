@@ -3,7 +3,6 @@ var router = express.Router();
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-
 /* GET home page. */
 router.get('/teams', function(req, res, next) {
       axios.get('https://raw.githubusercontent.com/ydelloyd/Datasets/master/teams.json')
