@@ -1,54 +1,60 @@
-var express = require('express');
+var express = require("express");
 var router = express.Router();
+var AWS = require("aws-sdk");
+AWS.config.update({ region: "us-east-1" });
 
-const knex = require('../db')
+var docClient = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" });
+var tableName = "event";
 
-router.get('/all', function(req, res, next) {
-  knex
-    .select("*")
-    .from("event")
-    .orderBy('id', 'desc')
-    .then((e)=>{
-      if(e.length === 0){
-        res.status(404).send({"message": "Could not find event"});
-      } else {
-        res.send(e);
-      }
-    })
-    .catch((error)=>{
-      res.status(500).send(error);
-    })
+router.get("/all", function (req, res, next) {
+  var params = {
+    TableName: tableName,
+  };
+
+  docClient.scan(params, function (err, data) {
+    if (err) {
+      console.log("Error", err);
+      res.status(err.statusCode).send(err);
+    } else {
+      console.log("Success", data.Items);
+      res.send(data.Items);
+    }
+  });
 });
 
-router.get('/:id', function(req, res, next) {
-  console.log(req.params.id);
-  knex
-    .select("*")
-    .from("event")
-    .where("id", req.params.id)
-    .then((e)=>{
-      if(e.length === 0){
-        res.status(404).send({"message": "Could not find event with id " + req.params.id});
-      } else {
-        res.send(e[0]);
-      }
-      
-    })
-    .catch((error)=>{
-      res.status(500).send(error);
-    })
+router.get("/:id", function (req, res, next) {
+  var params = {
+    TableName: tableName,
+    Key: { id: req.params.id },
+  };
+
+  docClient.get(params, function (err, data) {
+    if (err) {
+      console.log("Error", err);
+      res.status(err.statusCode).send(err);
+    } else {
+      console.log("Success", data.Item);
+      res.send(data.Item);
+    }
+  });
 });
 
-router.post('/', function(req, res, next) {
-  console.log(req.body);
-  knex("event")
-    .insert(req.body)
-    .then((e)=>{
-        res.send(e);
-    })
-    .catch((error)=>{
-      res.status(500).send(error);
-    })
+router.post("/", function (req, res, next) {
+  var params = {
+    TableName: tableName,
+    Item: req.body,
+  };
+
+  // Call DynamoDB to add the item to the table
+  docClient.put(params, function (err, data) {
+    if (err) {
+      console.log("Error", err);
+      res.status(err.statusCode).send(err);
+    } else {
+      console.log("Success", data);
+      res.send(data);
+    }
+  });
 });
 
 module.exports = router;
