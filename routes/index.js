@@ -24,14 +24,21 @@ router.get("/leaderboard", function (req, res, next) {
     .get("https://www.espn.com/golf/leaderboard")
     .then((response) => {
       if (response) {
+        const ind = {};
         const $ = cheerio.load(response.data);
+        const $th = $(".competitors thead tr");
+        const th = $($th.toArray()[0]).find("th").toArray();
+        th.forEach((e,i)=>{
+          ind[$(e).text()] = i
+        });
         const $trs = $(".competitors tbody tr");
         const leaderboard = {};
+        // console.log($trs.toArray()[0].find("td").toArray());
         $trs.toArray().forEach((tr) => {
           const tds = $(tr).find("td").toArray();
-          const playerPos = $(tds[0]).text();
-          const playerName = $(tds[1]).text();
-          const playerScore = $(tds[2]).text();
+          const playerPos = $(tds[ind["POS"]]).text();
+          const playerName = $(tds[ind["PLAYER"]]).text();
+          const playerScore = $(tds[ind["TO PAR"]]).text();
           leaderboard[playerName.replace(" (a)", "")] = {
             pos: playerPos,
             toPar: playerScore === "E" ? "0" : playerScore,

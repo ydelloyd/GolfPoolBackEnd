@@ -10,9 +10,8 @@ const transporter = nodemailer.createTransport({
   port: 465, // true for 465, false for other ports
   host: "smtp.gmail.com",
   auth: {
-    user: "dyingduckoboeplayer@gmail.com",
-    //ADD PASSWORD HERE
-    pass: "",
+    user: process.env.EMAIL,
+    pass: process.env.PASSWORD,
   },
   secure: true,
 });
@@ -53,7 +52,7 @@ router.get("/eventId/:id", function (req, res, next) {
 router.post("/", function (req, res, next) {
   const mailData = {
     from: "dyingduckoboeplayer@gmail.com", // sender address
-    to: "ydelloyd@gmail.com", // list of receivers
+    to: ["ydelloyd@gmail.com","jkaneko@traditionsgcc.com"], // list of receivers
     subject: "New team was created",
     text: `A team ${req.body.name} was created by ${
       req.body.owner
