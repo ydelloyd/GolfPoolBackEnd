@@ -35,16 +35,17 @@ router.get("/all", function (req, res, next) {
 router.get("/eventId/:id", function (req, res, next) {
   var params = {
     TableName: tableName,
-    Key: { id: req.params.id },
+    FilterExpression : 'eventId = :event_Id',
+    ExpressionAttributeValues : {':event_Id' : req.params.id}
   };
-
-  docClient.get(params, function (err, data) {
+  console.log(params)
+  docClient.scan(params, function (err, data) {
     if (err) {
       console.log("Error", err);
       res.status(err.statusCode).send(err);
     } else {
-      console.log("Success", data.Item);
-      res.send(data.Item);
+      console.log("Success", data.Items);
+      res.send(data.Items);
     }
   });
 });
