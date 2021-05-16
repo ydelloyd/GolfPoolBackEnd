@@ -17,7 +17,11 @@ router.get("/all", function (req, res, next) {
       res.status(err.statusCode).send(err);
     } else {
       console.log("Success", data.Items);
-      res.send(data.Items);
+      let results = data.Items;
+      results.sort(function (a, b) {
+        return b.eventStart.localeCompare(a.eventStart);
+      });
+      res.send(results);
     }
   });
 });
